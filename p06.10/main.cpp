@@ -4,9 +4,9 @@
 #include <new>
 #include <stdexcept>
 
-bool readNumbers(int* numbers, int n)
+bool readNumbers(int* numbers, size_t length)
 {
-  for (int* p = numbers; p < numbers + n; p++)
+  for (int* p = numbers; p < numbers + length; p++)
   {
     if (!(std::cin >> *p))
     {
@@ -16,10 +16,10 @@ bool readNumbers(int* numbers, int n)
   return true;
 }
 
-int sum(const int* numbers, int n)
+int sum(const int* numbers, size_t length)
 {
   int result = 0;
-  for (size_t i = 0; i < n; i++)
+  for (size_t i = 0; i < length; i++)
   {
     if ((numbers[i] > 0 && result > std::numeric_limits<int>::max() - numbers[i]) ||
         (numbers[i] < 0 && result < std::numeric_limits<int>::min() - numbers[i]))
@@ -31,7 +31,7 @@ int sum(const int* numbers, int n)
   return result;
 }
 
-void printNumbers(const int* numbers, int n)
+void printNumbers(const int* numbers, size_t n)
 {
   for (size_t i = 0; i < n; i++)
   {
@@ -47,31 +47,23 @@ int main()
   {
     return 1;
   }
-  if (n < 0)
+  if (n <= 0)
   {
     return 1;
   }
-  if (n == 0)
-  {
-    std::cout << "\n0\n0\n";
-    return 0;
-  }
+  size_t length = static_cast<size_t>(n);
 
   int* numbers = nullptr;
   try
   {
-    numbers = new int[n];
+    numbers = new int[length];
   }
   catch (const std::bad_alloc&)
   {
     return 2;
   }
-  catch (...)
-  {
-    return 3;
-  }
 
-  if (!readNumbers(numbers, n))
+  if (!readNumbers(numbers, length))
   {
     delete[] numbers;
     return 1;
@@ -81,8 +73,8 @@ int main()
   double average = 0;
   try
   {
-    s = sum(numbers, n);
-    average = static_cast<double>(s) / n;
+    s = sum(numbers, length);
+    average = static_cast<double>(s) / length;
   }
   catch (...)
   {
@@ -90,7 +82,7 @@ int main()
     return 3;
   }
 
-  printNumbers(numbers, n);
+  printNumbers(numbers, length);
   std::cout << "average = " << average << "\nsum = " << s << "\n";
 
   delete[] numbers;
