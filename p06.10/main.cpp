@@ -4,16 +4,60 @@
 #include <new>
 #include <stdexcept>
 
-bool readNumbers(int* numbers, size_t length)
+void increaseNumbers(int*& numbers, size_t& length)
 {
-  for (int* p = numbers; p < numbers + length; p++)
+  if (length > std::numeric_limits<size_t>::max() / 2)
   {
-    if (!(std::cin >> *p))
+    throw std::length_error("increaseNumbers: size overflow");
+  }
+
+  const size_t newLength = length * 2;
+  int* newNumbers = new int[newLength]();
+
+  for (size_t i = 0; i < length; i++)
+  {
+    newNumbers[i] = numbers[i];
+  }
+  for (size_t i = length; i < newLength; i++)
+  {
+    newNumbers[i] = 0;
+  }
+
+  delete[] numbers;
+  numbers = newNumbers;
+  length = newLength;
+}
+
+bool readNumbers(int*& numbers, size_t& length)
+{
+  size_t i = 0;
+  while (true)
+  {
+    if (!(std::cin >> numbers[i]))
     {
+      if (std::cin.eof())
+      {
+        break;
+      }
       return false;
     }
+    i++;
+    if (i == length)
+    {
+      increaseNumbers(numbers, length);
+    }
   }
+  length = i;
   return true;
+}
+
+void printNumbers(const int* numbers, size_t n)
+{
+  for (size_t i = 0; i < n; i++)
+  {
+    std::cout << numbers[i] << " ";
+  }
+  std::cout << "\n";
 }
 
 int sum(const int* numbers, size_t length)
@@ -31,27 +75,9 @@ int sum(const int* numbers, size_t length)
   return result;
 }
 
-void printNumbers(const int* numbers, size_t n)
-{
-  for (size_t i = 0; i < n; i++)
-  {
-    std::cout << numbers[i] << " ";
-  }
-  std::cout << "\n";
-}
-
 int main()
 {
-  int n = 0;
-  if (!(std::cin >> n))
-  {
-    return 1;
-  }
-  if (n <= 0)
-  {
-    return 1;
-  }
-  size_t length = static_cast<size_t>(n);
+  size_t length = 1;
 
   int* numbers = nullptr;
   try
